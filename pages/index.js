@@ -1,115 +1,232 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import React, { useContext, useEffect, useState } from 'react'
+import { useRouter } from "next/router";
+import { Api } from '@/services/service';
+import { ArrowUpRight, ArrowDownRight, Users, Briefcase, FileText, MessageSquare, Clock, CheckCircle, XCircle } from 'lucide-react';
+import isAuth from '@/components/isAuth';
+import { userContext } from './_app';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+function Home(props) {
+  const router = useRouter();
+  const [user, setUser] = useContext(userContext);
+  const [stats, setStats] = useState({
+    professionals: 25,
+    companies: 25,
+    activeProfiles: 25,
+    pendingApprovals: 25
+  });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  useEffect(() => {
+    // Fetch actual data from your API
+    // fetchDashboardData();
+  }, []);
 
-export default function Home() {
+  const fetchDashboardData = async () => {
+    try {
+      props.loader(true);
+      
+      // Example API calls - replace with your actual endpoints
+      const data = await Api("get", "getAllProfileBaseOnRole", {}, router);
+      const companiesRes = await Api("get", "companies/count", {}, router);
+      const activeRes = await Api("get", "profiles/active-count", {}, router);
+      const pendingRes = await Api("get", "approvals/pending-count", {}, router);
+
+      setStats({
+        professionals: data.data?.count || 0,
+        companies: companiesRes.data?.count || 0,
+        activeProfiles: activeRes.data?.count || 0,
+        pendingApprovals: pendingRes.data?.count || 0
+      });
+
+      props.loader(false);
+    } catch (error) {
+      props.loader(false);
+      props.toaster({ type: "error", message: "Failed to load dashboard data" });
+    }
+  };
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              pages/index.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <section className="w-full h-full bg-gray-50 md:p-6 p-4">
+      <div className="h-full overflow-y-scroll scrollbar-hide overflow-scroll pb-28">
+        {/* Dashboard Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center">
+              <span className="inline-block w-2 h-8 bg-blue-500 mr-3 rounded"></span>
+              Admin Dashboard
+            </h1>
+            <p className="text-gray-500 mt-1">Welcome back! Here's your overview</p>
+          </div>
+          <div className="bg-white shadow-sm rounded-lg p-2">
+            <div className="bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-md">
+              Today
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Dashboard Stats */}
+        <div className="grid md:grid-cols-4 grid-cols-1 gap-5 mb-8">
+          {/* Professionals Card */}
+          <StatsCard 
+            title="Total Professionals"
+            value={stats.professionals}
+            icon={<Users className="text-blue-500" size={32} />}
+            change={{
+              value: "12.5%",
+              type: "increase",
+              text: "New registrations"
+            }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+
+          {/* Companies Card */}
+          <StatsCard 
+            title="Registered Companies"
+            value={stats.companies}
+            icon={<Briefcase className="text-blue-500" size={32} />}
+            change={{
+              value: "3.2%",
+              type: "increase",
+              text: "This month"
+            }}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+
+          {/* Active Profiles Card */}
+          <StatsCard 
+            title="Active Profiles"
+            value={stats.activeProfiles}
+            icon={<CheckCircle className="text-blue-500" size={32} />}
+            change={{
+              value: "8.1%",
+              type: "increase",
+              text: "Active this week"
+            }}
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+          {/* Pending Approvals Card */}
+          <StatsCard 
+            title="Pending Approvals"
+            value={stats.pendingApprovals}
+            icon={<Clock className="text-blue-500" size={32} />}
+            change={{
+              value: "5",
+              type: "pending",
+              text: "Require attention"
+            }}
+          />
+        </div>
+
+        {/* Recent Activity Section */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="font-bold text-lg text-gray-800">Recent Activity</h2>
+          </div>
+          <div className="p-4">
+            <div className="flex flex-col space-y-4">
+              <ActivityItem 
+                type="new_professional"
+                name="John Doe"
+                time="2 hours ago"
+                status="pending"
+              />
+              <ActivityItem 
+                type="company_update"
+                name="Tech Corp Inc."
+                time="5 hours ago"
+                status="approved"
+              />
+              <ActivityItem 
+                type="profile_verification"
+                name="Sarah Johnson"
+                time="1 day ago"
+                status="rejected"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Stats Card Component
+const StatsCard = ({ title, value, icon, change }) => {
+  return (
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border-b-4 border-blue-500">
+      <div className="p-5">
+        <div className="flex justify-between items-start">
+          <div className="flex flex-col justify-start">
+            <p className="text-gray-500 text-sm font-medium">{title}</p>
+            <p className="text-gray-800 text-2xl md:text-3xl font-bold mt-2">{value}</p>
+          </div>
+          <div className="p-3 bg-blue-50 rounded-lg">
+            {icon}
+          </div>
+        </div>
+        
+        {change && (
+          <div className="mt-4 flex items-center">
+            {change.type === "increase" ? (
+              <ArrowUpRight size={18} className="text-green-500" />
+            ) : change.type === "decrease" ? (
+              <ArrowDownRight size={18} className="text-red-500" />
+            ) : (
+              <Clock size={18} className="text-yellow-500" />
+            )}
+            <p className="text-sm ml-1">
+              <span className={
+                change.type === "increase" ? "text-green-500 font-medium" : 
+                change.type === "decrease" ? "text-red-500 font-medium" : 
+                "text-yellow-500 font-medium"
+              }>
+                {change.value}
+              </span>
+              <span className="text-gray-500 ml-1">{change.text}</span>
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+// Activity Item Component
+const ActivityItem = ({ type, name, time, status }) => {
+  const getIcon = () => {
+    switch(type) {
+      case 'new_professional': return <Users size={18} />;
+      case 'company_update': return <Briefcase size={18} />;
+      case 'profile_verification': return <FileText size={18} />;
+      default: return <MessageSquare size={18} />;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch(status) {
+      case 'approved': return 'text-green-500';
+      case 'rejected': return 'text-red-500';
+      default: return 'text-yellow-500';
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-blue-50 rounded-full text-blue-500">
+          {getIcon()}
+        </div>
+        <div>
+          <p className="font-medium text-gray-800">
+            {type === 'new_professional' ? 'New Professional:' : 
+             type === 'company_update' ? 'Company Update:' : 
+             'Profile Verification:'} {name}
+          </p>
+          <p className="text-sm text-gray-500">{time}</p>
+        </div>
+      </div>
+      <div className={`text-sm font-medium ${getStatusColor()}`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </div>
+    </div>
+  );
+};
+
+export default isAuth(Home);
