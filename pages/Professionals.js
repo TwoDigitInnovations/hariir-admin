@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Api } from "@/services/service";
-import { Users, CheckCircle2, XCircle, Search, Filter } from "lucide-react";
+import { Users, CheckCircle2, XCircle, Search, Filter, AwardIcon ,Eye} from "lucide-react";
 import {
   Mail,
   Phone,
@@ -85,9 +85,8 @@ const Professionals = (props) => {
       );
       props.toaster({
         type: "success",
-        message: `Status ${
-          status === "Approved" ? "Approved" : "Rejected"
-        } successfully`,
+        message: `Status ${status === "Approved" ? "Approved" : "Rejected"
+          } successfully`,
       });
       getAllProfessional();
     } catch (error) {
@@ -183,7 +182,49 @@ const Professionals = (props) => {
       }
     });
   };
+  const handleVerifyRequestforCer = (cerid, status) => {
+    Swal.fire({
+      text: `Are you sure? You are about to ${status} verification for this experience.`,
+      icon: status === "Approved" ? "success" : "warning",
+      confirmButtonColor: status === "Approved" ? "#3085d6" : "#d33",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      cancelButtonColor: "#aaa",
+      confirmButtonText: `Yes, ${status} it!`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const data = {
+          userId: profileData._id,
+          certificationId: cerid,
+          status,
+        };
 
+        props.loader(true);
+        Api("post", "auth/CertificationVerification", data, router).then(
+          (res) => {
+            props.loader(false);
+            if (res.status) {
+              toast.success(res.message);
+              setOpen(false);
+              getAllProfessional();
+            } else {
+              toast.error(res.message);
+            }
+          },
+          (err) => {
+            props.loader(false);
+            console.error("Error:", err);
+            toast.error(err?.message || "An error occurred");
+          }
+        );
+      }
+    });
+  };
+    const viewCertificate = (url) => {
+        if (url) {
+            window.open(url, '_blank');
+        }
+    };
   return (
     <section className="w-full h-full bg-gray-50 md:p-6 p-4">
       {!open ? (
@@ -323,13 +364,12 @@ const Professionals = (props) => {
                         </td>
                         <td className=" whitespace-nowrap">
                           <span
-                            className={`px-4 py-2 inline-flex text-xs leading-5 font-semibold rounded-xl ${
-                              professional.status === "Approved"
-                                ? "bg-green-100 text-green-800"
-                                : professional.status === "Rejected"
+                            className={`px-4 py-2 inline-flex text-xs leading-5 font-semibold rounded-xl ${professional.status === "Approved"
+                              ? "bg-green-100 text-green-800"
+                              : professional.status === "Rejected"
                                 ? "bg-red-100 text-red-800"
                                 : "bg-yellow-100 text-yellow-800"
-                            }`}
+                              }`}
                           >
                             {professional.status}
                           </span>
@@ -501,15 +541,14 @@ const Professionals = (props) => {
                             </h3>
                             <div className="flex gap-4">
                               <button
-                                className={`text-[16px] font-semibold ${
-                                  exp.status === "Approved"
-                                    ? "text-green-600"
-                                    : exp.status === "Rejected"
+                                className={`text-[16px] font-semibold ${exp.status === "Approved"
+                                  ? "text-green-600"
+                                  : exp.status === "Rejected"
                                     ? "text-red-500"
                                     : exp.status === "Requested"
-                                    ? "text-blue-600"
-                                    : "text-yellow-500"
-                                }`}
+                                      ? "text-blue-600"
+                                      : "text-yellow-500"
+                                  }`}
                               >
                                 {exp.status === "Requested"
                                   ? "Verification Requested"
@@ -517,27 +556,27 @@ const Professionals = (props) => {
                               </button>
                               {(exp.status === "Requested" ||
                                 exp.status === "Rejected") && (
-                                <button
-                                  onClick={() =>
-                                    handleVerifyRequest(exp._id, "Approved")
-                                  }
-                                  className="mt-1 px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer"
-                                >
-                                  Verify
-                                </button>
-                              )}
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyRequest(exp._id, "Approved")
+                                    }
+                                    className="mt-1 px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer"
+                                  >
+                                    Verify
+                                  </button>
+                                )}
 
                               {(exp.status === "Requested" ||
                                 exp.status === "Approved") && (
-                                <button
-                                  onClick={() =>
-                                    handleVerifyRequest(exp._id, "Rejected")
-                                  }
-                                  className="mt-1 px-4 py-1.5 bg-red-500 text-white rounded hover:bg-red-700 text-sm cursor-pointer"
-                                >
-                                  Reject
-                                </button>
-                              )}
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyRequest(exp._id, "Rejected")
+                                    }
+                                    className="mt-1 px-4 py-1.5 bg-red-500 text-white rounded hover:bg-red-700 text-sm cursor-pointer"
+                                  >
+                                    Reject
+                                  </button>
+                                )}
                             </div>
                           </div>
                           <p className="text-blue-600 font-medium">
@@ -579,15 +618,14 @@ const Professionals = (props) => {
                           </h3>
                           <div className="flex gap-4">
                             <button
-                              className={`text-[16px] font-semibold ${
-                                edu.status === "Approved"
-                                  ? "text-green-600"
-                                  : edu.status === "Rejected"
+                              className={`text-[16px] font-semibold ${edu.status === "Approved"
+                                ? "text-green-600"
+                                : edu.status === "Rejected"
                                   ? "text-red-500"
                                   : edu.status === "Requested"
-                                  ? "text-blue-600"
-                                  : "text-yellow-500"
-                              }`}
+                                    ? "text-blue-600"
+                                    : "text-yellow-500"
+                                }`}
                             >
                               {edu.status === "Requested"
                                 ? "Verification Requested"
@@ -595,27 +633,27 @@ const Professionals = (props) => {
                             </button>
                             {(edu.status === "Requested" ||
                               edu.status === "Rejected") && (
-                              <button
-                                onClick={() =>
-                                  handleVerifyRequestforedu(edu._id, "Approved")
-                                }
-                                className="mt-1 px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer"
-                              >
-                                Verify
-                              </button>
-                            )}
+                                <button
+                                  onClick={() =>
+                                    handleVerifyRequestforedu(edu._id, "Approved")
+                                  }
+                                  className="mt-1 px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer"
+                                >
+                                  Verify
+                                </button>
+                              )}
 
                             {(edu.status === "Requested" ||
                               edu.status === "Approved") && (
-                              <button
-                                onClick={() =>
-                                  handleVerifyRequestforedu(edu._id, "Rejected")
-                                }
-                                className="mt-1 px-4 py-1.5 bg-red-500 text-white rounded hover:bg-red-700 text-sm cursor-pointer"
-                              >
-                                Reject
-                              </button>
-                            )}
+                                <button
+                                  onClick={() =>
+                                    handleVerifyRequestforedu(edu._id, "Rejected")
+                                  }
+                                  className="mt-1 px-4 py-1.5 bg-red-500 text-white rounded hover:bg-red-700 text-sm cursor-pointer"
+                                >
+                                  Reject
+                                </button>
+                              )}
                           </div>
                         </div>
                         <p className="text-blue-600 font-medium">
@@ -635,6 +673,98 @@ const Professionals = (props) => {
                 <p className="text-black text-center">
                   {" "}
                   Not Found Any Education
+                </p>
+              )}
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 border-b pb-2 mb-4 flex items-center">
+                <AwardIcon size={20} className="mr-2" />
+                Certifications
+              </h2>
+              {profileData?.certifications?.length > 0 ? (
+                <section className="mb-8">
+                  <div className="grid md:grid-cols-1 gap-4">
+                    {profileData.certifications.map((cer, index) => (
+                      <div
+                        key={index}
+                        className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex md:flex-row flex-col  mb-1 justify-between">
+                          <h3 className="text-lg font-semibold text-gray-800">
+                            {cer.certificateName}
+                          </h3>
+                          <div className="flex gap-4">
+                            <button
+                              className={`text-[16px] font-semibold ${cer.status === "Approved"
+                                ? "text-green-600"
+                                : cer.status === "Rejected"
+                                  ? "text-red-500"
+                                  : cer.status === "Requested"
+                                    ? "text-blue-600"
+                                    : "text-yellow-500"
+                                }`}
+                            >
+                              {cer.status === "Requested"
+                                ? "Verification Requested"
+                                : cer.status}
+                            </button>
+                            {(cer.status === "Requested" ||
+                              cer.status === "Rejected") && (
+                                <button
+                                  onClick={() =>
+                                    handleVerifyRequestforCer(cer._id, "Approved")
+                                  }
+                                  className="mt-1 px-4 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer"
+                                >
+                                  Verify
+                                </button>
+                              )}
+
+                            {(cer.status === "Requested" ||
+                              cer.status === "Approved") && (
+                                <button
+                                  onClick={() =>
+                                    handleVerifyRequestforCer(cer._id, "Rejected")
+                                  }
+                                  className="mt-1 px-4 py-1.5 bg-red-500 text-white rounded hover:bg-red-700 text-sm cursor-pointer"
+                                >
+                                  Reject
+                                </button>
+                              )}
+                          </div>
+                        </div>
+                        <div className="flex justify-between">
+                          <p className="text-blue-600 text-[16px] font-medium">
+                            {cer.issuerName || "N/A"}
+                          </p>
+                          <div className="flex gap-2 items-center">
+                            {cer.attachmentUrl && (
+                              <button
+                                onClick={() => viewCertificate(cer.attachmentUrl)}
+                                className="text-blue-600 flex items-center gap-2 hover:text-blue-800 p-1"
+                                title="View Certificate"
+                              >
+                                Document <Eye size={18} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-gray-500 text-[14px]">
+                          Issue Date: {cer.issueDate || "N/A"}
+                        </p>
+                        {cer.certificateNumber && (
+                          <p className="text-gray-500 text-[14px]">
+                            Certificate No: {cer.certificateNumber}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : (
+                <p className="text-black text-center">
+                  {" "}
+                  Not Found Any Certification
                 </p>
               )}
             </div>
