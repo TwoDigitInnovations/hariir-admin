@@ -4,46 +4,41 @@ import { Api } from '@/services/service';
 import { ArrowUpRight, ArrowDownRight, Users, Briefcase, FileText, MessageSquare, Clock, CheckCircle, XCircle } from 'lucide-react';
 import isAuth from '@/components/isAuth';
 import { userContext } from './_app';
+import { toast } from 'react-toastify';
+
 
 function Home(props) {
   const router = useRouter();
   const [user, setUser] = useContext(userContext);
   const [stats, setStats] = useState({
-    professionals: 25,
-    companies: 25,
-    activeProfiles: 25,
-    pendingApprovals: 25
+    professionals:"",
+    companies:"",
+    activeProfiles:"",
+    pendingApprovals:""
   });
-
   useEffect(() => {
-    // Fetch actual data from your API
-    // fetchDashboardData();
+    getAllData();
   }, []);
 
-  const fetchDashboardData = async () => {
-    try {
-      props.loader(true);
-      
-      // Example API calls - replace with your actual endpoints
-      const data = await Api("get", "getAllProfileBaseOnRole", {}, router);
-      const companiesRes = await Api("get", "companies/count", {}, router);
-      const activeRes = await Api("get", "profiles/active-count", {}, router);
-      const pendingRes = await Api("get", "approvals/pending-count", {}, router);
+  const getAllData = () => {
+    props.loader(true);
 
-      setStats({
-        professionals: data.data?.count || 0,
-        companies: companiesRes.data?.count || 0,
-        activeProfiles: activeRes.data?.count || 0,
-        pendingApprovals: pendingRes.data?.count || 0
-      });
-
-      props.loader(false);
-    } catch (error) {
-      props.loader(false);
-      props.toaster({ type: "error", message: "Failed to load dashboard data" });
-    }
+    Api("get", "auth/dashboardInfo", null, router).then(
+      (res) => {
+        props.loader(false);
+        setStats({
+          professionals: res.data?.totalProfessionals || 0,
+          companies: res.data?.totalCompanies || 0,
+          activeProfiles: res.data?.activeProfiles || 0,
+          pendingApprovals: res.data?.pendingProfiles || 0,
+        });
+      },
+      (err) => {
+        props.loader(false);
+        toast.error(err?.data?.message || err?.message || "An error occurred");
+      }
+    );
   };
-
   return (
     <section className="w-full h-full bg-gray-50 md:p-6 p-4">
       <div className="h-full overflow-y-scroll scrollbar-hide overflow-scroll pb-28">
@@ -66,7 +61,7 @@ function Home(props) {
         {/* Dashboard Stats */}
         <div className="grid md:grid-cols-4 grid-cols-1 gap-5 mb-8">
           {/* Professionals Card */}
-          <StatsCard 
+          <StatsCard
             title="Total Professionals"
             value={stats.professionals}
             icon={<Users className="text-blue-500" size={32} />}
@@ -78,7 +73,7 @@ function Home(props) {
           />
 
           {/* Companies Card */}
-          <StatsCard 
+          <StatsCard
             title="Registered Companies"
             value={stats.companies}
             icon={<Briefcase className="text-blue-500" size={32} />}
@@ -90,7 +85,7 @@ function Home(props) {
           />
 
           {/* Active Profiles Card */}
-          <StatsCard 
+          <StatsCard
             title="Active Profiles"
             value={stats.activeProfiles}
             icon={<CheckCircle className="text-blue-500" size={32} />}
@@ -102,7 +97,7 @@ function Home(props) {
           />
 
           {/* Pending Approvals Card */}
-          <StatsCard 
+          <StatsCard
             title="Pending Approvals"
             value={stats.pendingApprovals}
             icon={<Clock className="text-blue-500" size={32} />}
@@ -121,19 +116,19 @@ function Home(props) {
           </div>
           <div className="p-4">
             <div className="flex flex-col space-y-4">
-              <ActivityItem 
+              <ActivityItem
                 type="new_professional"
                 name="John Doe"
                 time="2 hours ago"
                 status="pending"
               />
-              <ActivityItem 
+              <ActivityItem
                 type="company_update"
                 name="Tech Corp Inc."
                 time="5 hours ago"
                 status="approved"
               />
-              <ActivityItem 
+              <ActivityItem
                 type="profile_verification"
                 name="Sarah Johnson"
                 time="1 day ago"
@@ -161,7 +156,7 @@ const StatsCard = ({ title, value, icon, change }) => {
             {icon}
           </div>
         </div>
-        
+
         {change && (
           <div className="mt-4 flex items-center">
             {change.type === "increase" ? (
@@ -173,9 +168,9 @@ const StatsCard = ({ title, value, icon, change }) => {
             )}
             <p className="text-sm ml-1">
               <span className={
-                change.type === "increase" ? "text-green-500 font-medium" : 
-                change.type === "decrease" ? "text-red-500 font-medium" : 
-                "text-yellow-500 font-medium"
+                change.type === "increase" ? "text-green-500 font-medium" :
+                  change.type === "decrease" ? "text-red-500 font-medium" :
+                    "text-yellow-500 font-medium"
               }>
                 {change.value}
               </span>
@@ -191,7 +186,7 @@ const StatsCard = ({ title, value, icon, change }) => {
 // Activity Item Component
 const ActivityItem = ({ type, name, time, status }) => {
   const getIcon = () => {
-    switch(type) {
+    switch (type) {
       case 'new_professional': return <Users size={18} />;
       case 'company_update': return <Briefcase size={18} />;
       case 'profile_verification': return <FileText size={18} />;
@@ -200,7 +195,7 @@ const ActivityItem = ({ type, name, time, status }) => {
   };
 
   const getStatusColor = () => {
-    switch(status) {
+    switch (status) {
       case 'approved': return 'text-green-500';
       case 'rejected': return 'text-red-500';
       default: return 'text-yellow-500';
@@ -215,9 +210,9 @@ const ActivityItem = ({ type, name, time, status }) => {
         </div>
         <div>
           <p className="font-medium text-gray-800">
-            {type === 'new_professional' ? 'New Professional:' : 
-             type === 'company_update' ? 'Company Update:' : 
-             'Profile Verification:'} {name}
+            {type === 'new_professional' ? 'New Professional:' :
+              type === 'company_update' ? 'Company Update:' :
+                'Profile Verification:'} {name}
           </p>
           <p className="text-sm text-gray-500">{time}</p>
         </div>

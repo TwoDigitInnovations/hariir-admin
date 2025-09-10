@@ -95,9 +95,9 @@ const Company = (props) => {
   const filteredCompanies = companies.filter(
     (company) =>
       company.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.phone.includes(searchTerm) ||
-      company.industry.toLowerCase().includes(searchTerm.toLowerCase())
+      company.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      company.phone?.includes(searchTerm) ||
+      company.industry?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

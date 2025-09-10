@@ -1,13 +1,14 @@
 import { MdEmail, MdPassword } from "react-icons/md";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useContext, useState } from "react";
 import { Api } from "@/services/service";
 import { useRouter } from "next/router";
 import { userContext } from "./_app";
-import Swal from "sweetalert2";
 
 export default function Login(props) {
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [userDetail, setUserDetail] = useState({
     username: "",
     password: "",
@@ -48,11 +49,11 @@ export default function Login(props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md  bg-white rounded-2xl shadow-lg p-8">
         {/* Logo Header */}
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center shadow-lg mb-4">
+        <div className="text-center mb-8 animate-fadeIn ">
+          <div className="mx-auto w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg mb-4 transform transition hover:scale-105">
             <span className="text-white text-2xl font-bold">H</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-800">
@@ -62,7 +63,7 @@ export default function Login(props) {
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-xl shadow-md p-8 space-y-6 border border-gray-100">
+        <div className=" space-y-6  animate-slideUp">
           {/* Email Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -81,12 +82,13 @@ export default function Login(props) {
                   setUserDetail({ ...userDetail, username: e.target.value })
                 }
               />
+              {submitted && !userDetail.username && (
+                <p className="mt-1 text-sm text-red-600">Email is required</p>
+              )}
             </div>
-            {submitted && !userDetail.username && (
-              <p className="mt-1 text-sm text-red-600">Email is required</p>
-            )}
           </div>
 
+          {/* Password Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -96,51 +98,30 @@ export default function Login(props) {
                 <MdPassword className="text-gray-400" />
               </div>
               <input
-                type="password"
-                className="block w-full text-black pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                type={showPassword ? "text" : "password"}
+                className="block w-full text-black pl-10 pr-10 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
                 placeholder="*********"
                 value={userDetail.password}
                 onChange={(e) =>
                   setUserDetail({ ...userDetail, password: e.target.value })
                 }
               />
+              <span
+                className="absolute right-3 top-4 text-gray-500 cursor-pointer hover:text-gray-700"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
             </div>
             {submitted && !userDetail.password && (
               <p className="mt-1 text-sm text-red-600">Password is required</p>
             )}
           </div>
 
-          {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-700"
-              >
-                Remember me
-              </label>
-            </div>
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-medium text-blue-500 hover:text-blue-400"
-              >
-                Forgot password?
-              </a>
-            </div>
-          </div>
-
-          {/* Submit Button */}
           <div>
             <button
               onClick={submit}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform duration-200 hover:scale-[1.02]"
             >
               Sign in
             </button>
@@ -148,7 +129,7 @@ export default function Login(props) {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-500">
+        <div className="mt-8 text-center text-sm text-gray-500 animate-fadeIn">
           <p>
             © {new Date().getFullYear()} Harrier Admin. All rights reserved.
           </p>

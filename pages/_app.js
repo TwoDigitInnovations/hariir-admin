@@ -34,7 +34,6 @@ export default function App({ Component, pageProps }) {
 
     if (user) {
       setUser(JSON.parse(user));
-      router.push("/");
     } else {
       if (router.route !== "/login" && router.route !== "/signup") {
         router.push("/login");

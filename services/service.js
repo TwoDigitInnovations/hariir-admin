@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// export const ConstantsUrl = "http://localhost:3003/api/";
-export const ConstantsUrl = "https://api.guuldoon.com/api/";
+export const ConstantsUrl = "http://localhost:3003/api/";
+// export const ConstantsUrl = "https://api.guuldoon.com/api/";
 
 function Api(method, url, data, router) {
   return new Promise(function (resolve, reject) {

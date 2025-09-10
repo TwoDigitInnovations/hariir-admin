@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Api } from "@/services/service";
-import { Users, CheckCircle2, XCircle, Search, Filter, AwardIcon ,Eye} from "lucide-react";
+import { Users, CheckCircle2, XCircle, Search, Filter, AwardIcon, Eye } from "lucide-react";
 import {
   Mail,
   Phone,
@@ -102,8 +102,8 @@ const Professionals = (props) => {
   const filteredProfessionals = professionals.filter(
     (professional) =>
       professional.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      professional.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      professional.phone.includes(searchTerm)
+      professional.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      professional.phone?.includes(searchTerm)
   );
 
   const handleVerifyRequest = (expid, status) => {
@@ -144,6 +144,7 @@ const Professionals = (props) => {
       }
     });
   };
+
   const handleVerifyRequestforedu = (expid, status) => {
     Swal.fire({
       text: `Are you sure? You are about to ${status} verification for this experience.`,
@@ -182,6 +183,7 @@ const Professionals = (props) => {
       }
     });
   };
+  
   const handleVerifyRequestforCer = (cerid, status) => {
     Swal.fire({
       text: `Are you sure? You are about to ${status} verification for this experience.`,
@@ -220,11 +222,12 @@ const Professionals = (props) => {
       }
     });
   };
-    const viewCertificate = (url) => {
-        if (url) {
-            window.open(url, '_blank');
-        }
-    };
+
+  const viewCertificate = (url) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
   return (
     <section className="w-full h-full bg-gray-50 md:p-6 p-4">
       {!open ? (
